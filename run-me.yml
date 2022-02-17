@@ -1,0 +1,50 @@
+---
+- hosts: project_pc
+  become: yes
+  tasks:
+  - name: github
+    command: git clone https://github.com/Jeniston14/wsr-skillcloud
+  - name: "Install curl and Update repo"
+    apt:
+      update_cache: true
+      name: "curl"
+      state: "latest"
+  - name: ufw start
+    service:
+      name: ufw
+      state: started
+  - name: ports
+    command: ufw allow 80,8080,1834/tcp
+  - name: SSH port
+    command: sed -i 's/#Port 22/Port 1834/g' /etc/ssh/sshd_config
+  - name: User
+    user: name=Webdeveloper shell=/bin/bash password=S52we9V6QTp7
+  - name: User2
+    user: name=Devopsengineer shell=/bin/bash password=dHy6sKGHsj2T
+  - name: User3
+    user: name=Projectmanager shell=/bin/bash password=oP92ugMSaCbe
+  - name: Docker
+    apt:
+      name: docker
+      state: latest
+  - apt:
+      name: docker.io
+      state: latest
+  - name: compose
+    command: chmod ugo+wrx ~/wsr-skillcloud/docker-compose.sh
+  - name: exec
+    command: sh ~/wsr-skillcloud/docker-compose.sh
+  - name: mkdir
+    command: mkdir /skillcloud-nginx
+  - name: cp
+    command: cp -a ~/wsr-skillcloud/Dockerfile-site ~/wsr-skillcloud/Dockerfile-balance ~/wsr-skillcloud/docker-compose.yml ~/wsr-skillcloud/index.html ~/wsr-skillcloud/nginx.conf  /skillcloud-nginx
+  - name: restart
+    service:
+      name: ufw
+      state: restarted
+  - service:
+      name: ssh
+      state: restarted
+  - name: restart
+    command: reboot
+...
